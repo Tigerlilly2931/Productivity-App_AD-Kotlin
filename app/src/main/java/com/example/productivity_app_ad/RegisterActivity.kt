@@ -1,7 +1,6 @@
 package com.example.productivity_app_ad
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -9,15 +8,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
 
     private var emailTextView: EditText? = null
     private var passwordTextView: EditText? = null
     private var Btn: Button? = null
+    private var usernameTextView: EditText? = null
     private var toLogIn: Button? = null
     private var progressbar: ProgressBar? = null
     private var mAuth: FirebaseAuth? = null
@@ -28,6 +28,7 @@ class RegisterActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         emailTextView = findViewById(R.id.email)
         passwordTextView = findViewById(R.id.passwd)
+        usernameTextView = findViewById(R.id.username)
         Btn = findViewById(R.id.btnregister)
         toLogIn = findViewById(R.id.btnlogin)
         progressbar = findViewById(R.id.progressbar)
@@ -39,12 +40,16 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun registerNewUser() {
-        val email: String
-        val password: String
+        val username: String = usernameTextView!!.text.toString()
+        //val email: String = emailTextView!!.text.toString()
         val splitter = emailTextView!!.text.toString().split("\\s+").toTypedArray()
-        email = splitter[0]
-        password = passwordTextView!!.text.toString()
+        val email = splitter[0]
+        val password: String = passwordTextView!!.text.toString()
         progressbar!!.visibility = View.VISIBLE
+        if(TextUtils.isEmpty(username)){
+            Toast.makeText(applicationContext, "Please enter a username!", Toast.LENGTH_LONG).show()
+            return
+        }
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(applicationContext, "Please enter email!", Toast.LENGTH_LONG).show()
             return
@@ -56,16 +61,11 @@ class RegisterActivity : AppCompatActivity() {
         mAuth!!.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Toast.makeText(applicationContext, "Beep Boop You're In!", Toast.LENGTH_LONG).show()
-                val split = email.split("@").toTypedArray()
-                val name =
-                    split[0].substring(0, 1).uppercase(Locale.getDefault()) + split[0].substring(1)
-                        .lowercase(
-                            Locale.getDefault()
-                        )
                 progressbar!!.visibility = View.GONE
                 val user = mAuth!!.currentUser
-                val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(name).build()
+                val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(username).build()
                 user!!.updateProfile(profileUpdates)
+                usernameTextView!!.setText("")
                 emailTextView!!.setText("")
                 passwordTextView!!.setText("")
                 val intent = Intent(this@RegisterActivity, MainActivity::class.java)

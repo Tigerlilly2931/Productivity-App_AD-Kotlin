@@ -16,6 +16,13 @@
         android:text="Register"
         android:textSize="34sp" />
 
+    <!-- Edit text for username -->
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Enter your Username" />
+
     <!-- Edit text for email -->
     <EditText
         android:id="@+id/email"
